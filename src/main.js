@@ -1,6 +1,6 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import { setupCounter } from './counter.js'
+import 'virtual:windi.css'
+import javascriptLogo from '/assets/javascript.svg'
+import { setupCounter } from './counter'
 
 document.querySelector('#app').innerHTML = `
   <div>
