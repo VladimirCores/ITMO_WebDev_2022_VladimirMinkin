@@ -3,10 +3,13 @@
 import { defineConfig } from "vite";
 import mkcert from "vite-plugin-mkcert";
 import WindiCSS from 'vite-plugin-windicss'
+import Icons from 'unplugin-icons/vite'
 
 export default defineConfig({
   // omit
-  plugins: [mkcert(),
+  plugins: [
+    mkcert(),
+    Icons({ compiler: 'raw', }),
     WindiCSS({
       scan: {
         dirs: ['.', './**/*.html'], // all files in the cwd

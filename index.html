@@ -5,9 +5,42 @@
     <link href="/vite.svg" rel="icon" type="image/svg+xml"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Vite App Welcome</title>
-    <script src="src/main.js"></script>
   </head>
   <body>
-    <div class="p-12 bg-gray-500 border-gray-500">Box</div>
+    <div class="flex justify-center place-content-center bg-gray-100 h-screen">
+      <article class="my-auto w-96 bg-white rounded-xl p-6 flex flex-col justify-between">
+        <header class="flex flex-row justify-between items-center">
+          <span class="text-red-500" style="content: url('https://api.iconify.design/icon-park-solid/youtube.svg?color=red&width=48');"></span>
+          <div class="rounded-full px-3 py-1 bg-green-100 text-green-500 font-medium text-xs h-full">Free</div>
+        </header>
+        <main class="flex flex-col pt-12 pb-8 ">
+          <section class="flex flex-col pb-8">
+            <h4 class="text-base text-sm font-light">Videos</h4>
+            <h2 class="text-2xl font-bold mt-2">Youtube</h2>
+          </section>
+          <section class="flex flex-row">
+            <div class="flex-1">
+              <div class="font-light text-gray-500 text-xs text-">Rating</div>
+              <div class="font-bold text-lg mt-1">0.5</div>
+            </div>
+            <div class="flex-1">
+              <div class="font-light text-gray-500 text-xs">Size</div>
+              <div class="font-bold text-lg mt-1">98.5 mb</div>
+            </div>
+            <div class="flex-1">
+              <div class="font-light text-gray-500 text-xs">Downloads</div>
+              <div class="font-bold text-lg mt-1">13.5 m</div>
+            </div>
+          </section>
+        </main>
+        <footer class="flex flex-row justify-between items-center">
+          <button>
+            <span style="content: url('https://api.iconify.design/bi/arrow-down-circle-fill.svg?color=%2301aa01&width=36');"></span>
+          </button>
+          <div class="text-gray-200">There will be icon</div>
+        </footer>
+      </article>
+    </div>
+    <script src="src/main.js" type="module"></script>
   </body>
 </html>
