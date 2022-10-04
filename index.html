@@ -2,9 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8"/>
-    <link rel="icon" type="image/svg+xml" href="/vite.svg"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="/vite.svg" rel="icon" type="image/svg+xml"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Vite App Welcome</title>
+    <style>
+      .block {
+        display: block;
+      }
+    </style>
   </head>
   <body style="">
     <h1>This is heading 1</h1>
@@ -13,23 +18,25 @@
     <h4>This is heading 4</h4>
     <h5>This is heading 5</h5>
     <h6>This is heading 6</h6>
-    <b> - Bold text</b>
-    <strong> - Important text</strong>
-    <i> - Italic text</i>
-    <em> - Emphasized text</em>
-    <mark> - Marked text</mark>
-    <small> - Small text</small>
-    <del> - Deleted text</del>
-    <ins> - Inserted text</ins>
-    <sub> - Subscript text</sub>
-    <sup> - Superscript text</sup>
-    <p>The easiest thing you can do in HTML is write a sentence.
-       To do this you need to know one of the very basic and easy to use tags - the</p>
+    <b class="block"> - Bold text</b>
+    <strong class="block"> - Important text</strong>
+    <i class="block"> - Italic text</i>
+    <em class="block"> - Emphasized text</em>
+    <mark class="block"> - Marked text</mark>
+    <small class="block"> - Small text</small>
+    <del class="block"> - Deleted text</del>
+    <ins class="block"> - Inserted text</ins>
+    <sub class="block"> - Subscript text</sub>
+    <sup class="block"> - Superscript text</sup>
+    <p>
+      The easiest thing you can do in HTML is write a sentence.
+      To do this you need to know one of the very basic and easy to use tags - the
+    </p>
     <br>
     <!-- Write your comments here -->
     <!-- This comment
     is also legit -->
-    <q> Use q for short quotes </q>
+    <q class="block"> Use q for short quotes </q>
     <blockquote>
       The blockquote tag should be used when we want to talk
       about some long quote that is quoted from another source.
@@ -40,8 +47,71 @@
       probably
       quote.
     </blockquote>
-    <img src="https://i.redd.it/tfugj4n3l6ez.png" alt="What your image is about">
-    <a href="https://developer.mozilla.org/en-US/">MDN</a>
+    <form action="#" method="post" name="enrollmentForm">
+      <table border="1" cellpadding="5" cellspacing="5" width="800">
+          <th colspan="2"><h1>Enrollment Form </h1></th>
+          <tr>
+            <td>First Name:</td>
+            <td><Input id="firstNameText1" name="firstNameText" type="text"/> </td>
+          </tr>
+          <tr>
+            <td>Last Name:</td>
+            <td><Input id="lastNameText1" name="lastNameText" type="text"/></td>
+          </tr>
+          <tr>
+            <td>Password:</td>
+            <td><Input id="password1" name="password" type="password"/></td>
+          </tr>
+          <tr>
+            <td>Gender:</td>
+            <td>
+                <input id="male" name="gender" type="radio" value="male"/> Male
+                <input id="female" name="gender" type="radio" value="female"/> Female
+                <input id="other" name="gender" type="radio" value="other"/> Other
+            </td>
+          </tr>
+  
+          <tr>
+              <td>Hobby:</td>
+              <td>
+                  <input id="reading" name="reading" type="checkbox" value="reading"/> Reading
+                  <input id="music" name="music" type="checkbox" value="music"/> Music
+                  <input id="dance" name="dance" type="checkbox" value="dance"/> Dance
+                  <input id="sports" name="sports" type="checkbox" value="sports"/> Sports
+              </td>
+          </tr>
+  
+          <tr>
+              <td>Country:</td>
+              <td>
+                  <select id="country" name="country">
+                      <option value="india">India</option>
+                      <option value="usa">USA</option>
+                      <option value="uk">UK</option>
+                      <option value="nz">NZ</option>
+                  </select>
+              </td>
+          </tr>
+  
+          <tr>
+              <td>Comments:</td>
+              <td>
+                  <textarea cols="40" rows="5">Enter Comments</textarea>
+              </td>
+          </tr>
+  
+          <tr>
+              <td colspan="2">
+                  <center>
+                      <input name="submit" type="submit" value="Submit">
+                      <input name="reset" type="reset" value="Reset"/>
+                  </center>
+              </td>
+          </tr>
+      </table>
+    </form>
+    <img alt="What your image is about" src="https://i.redd.it/tfugj4n3l6ez.png">
+    <a class="block" href="https://developer.mozilla.org/en-US/">MDN</a>
     <p>
       This is done with the target attribute.
       The target attribute specifies where to open the linked document and it can have one of the following values:
