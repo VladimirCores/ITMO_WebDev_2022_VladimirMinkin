@@ -1,35 +1,28 @@
-const domInpTodoTitle = document.getElementById("inpTodoTitle");
-const domBtnCreateTodo = document.getElementById("btnCreateTodo");
-const domListOfTodos = document.getElementById("listOfTodos");
+import TodoVO from './src/model/vos/TodoVO.js';
 
-domBtnCreateTodo.addEventListener("click", onBtnCreateTodoClick);
+const domInpTodoTitle = document.getElementById('inpTodoTitle');
+const domBtnCreateTodo = document.getElementById('btnCreateTodo');
+const domListOfTodos = document.getElementById('listOfTodos');
 
-class TodoVO {
-  constructor(id, title, date = new Date()) {
-    this.id = id;
-    this.title = title;
-    this.date = date;
-    this.isCompleted = false;
-  }
-}
+domBtnCreateTodo.addEventListener('click', onBtnCreateTodoClick);
 
-const listOfTodos = [];
+const LOCAL_LIST_OF_TODOS = 'listOfTodos';
+
+const localListOfTodos = localStorage.getItem(LOCAL_LIST_OF_TODOS);
+const listOfTodos = localListOfTodos != null ? JSON.parse(localListOfTodos) : [];
+
+console.log('> Initial value -> listOfTodos', listOfTodos);
+
+renderTodoListInContainer(listOfTodos, domListOfTodos);
 
 function onBtnCreateTodoClick(event) {
-  console.log("> domBtnCreateTodo -> handle(click)", event);
+  // console.log('> domBtnCreateTodo -> handle(click)', event);
   const todoTitleValueFromDomInput = domInpTodoTitle.value;
-  console.log("> domBtnCreateTodo -> todoInputTitleValue:", todoTitleValueFromDomInput);
-
-  const canCreateTodo = validateTodoInputTitleValue(todoTitleValueFromDomInput);
-
-  if (canCreateTodo) {
-    const todoVO = createTodoVO(todoTitleValueFromDomInput);
-    listOfTodos.push(todoVO);
-    let output = "";
-    for (let index in listOfTodos) {
-      output += `<li>${listOfTodos[index].title}</li>`;
-    }
-    domListOfTodos.innerHTML = output;
+  // console.log('> domBtnCreateTodo -> todoInputTitleValue:', todoTitleValueFromDomInput);
+  if (validateTodoInputTitleValue(todoTitleValueFromDomInput)) {
+    listOfTodos.push(createTodoVO(todoTitleValueFromDomInput));
+    localStorage.setItem(LOCAL_LIST_OF_TODOS, JSON.stringify(listOfTodos));
+    renderTodoListInContainer(listOfTodos, domListOfTodos);
   }
 }
 
@@ -37,15 +30,12 @@ function validateTodoInputTitleValue(value) {
   const isInputValueString = typeof value === 'string';
   const isInputValeNotNumber = isNaN(parseInt(value));
 
-  const result =
-        isInputValueString
-    &&  isInputValeNotNumber
-    &&  value.length > 0;
+  const result = isInputValueString && isInputValeNotNumber && value.length > 0;
 
   console.log('> validateTodoInputTitleValue -> result', {
     result,
     isInputValueString,
-    isInputValeNotNumber
+    isInputValeNotNumber,
   });
   return result;
 }
@@ -53,4 +43,14 @@ function validateTodoInputTitleValue(value) {
 function createTodoVO(title) {
   const todoId = Date.now().toString();
   return new TodoVO(todoId, title);
+}
+
+function renderTodoListInContainer(list, container) {
+  let output = '';
+  let item;
+  for (let index in list) {
+    item = list[index];
+    output += `<li>${item.title}</li>`;
+  }
+  container.innerHTML = output;
 }
