@@ -28,26 +28,24 @@ render_TodoListInContainer(listOfTodos, domListOfTodos);
 disableOrEnable_CreateTodoButtonOnTodoInputTitle();
 
 function onTodoDomItemClicked(event) {
-  console.log('> onTodoDomItemClicked click -> dataset:', event.target.dataset);
-  if (event.target.dataset['type'] !== TodoView.TODO_VIEW_ITEM) return;
+  const domElement = event.target;
+  // console.log('> onTodoDomItemClicked click -> dataset:', target.dataset);
+  if (domElement.dataset['type'] !== TodoView.TODO_VIEW_ITEM) return;
 
-  const isClickedOnSameTodo = selectedTodoViewItem === event.target;
-  const isAnotherTodoSelected = selectedTodoVO != null;
+  const SELECTED_ITEM_BACKGROUND_KEY = 'lightgray';
 
-  if (isClickedOnSameTodo) return resetSelectedTodo();
-  else if (isAnotherTodoSelected) resetSelectedTodo();
+  const todoId = domElement.id;
+  const todoVO = listOfTodos.find((vo) => vo.id === todoId);
 
-  selectedTodoViewItem = event.target;
+  const isSelected = domElement.style.backgroundColor === SELECTED_ITEM_BACKGROUND_KEY;
 
-  if (selectedTodoVO == null) {
-    const todoID = event.target.id;
-    const todoVO = listOfTodos.find((item) => item.id === todoID);
+  if (isSelected) {
+    domInpTodoTitle.value = '';
+    domElement.style.backgroundColor = '';
+  } else {
     selectedTodoVO = todoVO;
-    console.log('> domListOfTodos click -> todoVO:', todoVO);
     domInpTodoTitle.value = todoVO.title;
-    domBtnCreateTodo.innerText = 'Update';
-    selectedTodoViewItem.style.backgroundColor = 'lightgrey';
-    disableOrEnable_CreateTodoButtonOnTodoInputTitle(() => false);
+    domElement.style.backgroundColor = SELECTED_ITEM_BACKGROUND_KEY;
   }
 }
 
@@ -64,18 +62,16 @@ function onTodoListChange(event) {
   }
 }
 
-function onBtnCreateTodoClick() {
+function onBtnCreateTodoClick(event) {
   // console.log('> domBtnCreateTodo -> handle(click)', this.attributes);
-  const todoTitleValueFromDomInput = domInpTodoTitle.value;
+  const todoTitle_Value_FromDomInput = domInpTodoTitle.value;
   // console.log('> domBtnCreateTodo -> todoInputTitleValue:', todoTitleValueFromDomInput);
-  if (isStringNotNumberAndNotEmpty(todoTitleValueFromDomInput)) {
-    if (selectedTodoVO) {
-      selectedTodoVO.title = todoTitleValueFromDomInput;
-      resetSelectedTodo();
-    } else {
-      create_TodoFromTextAndAddToList(todoTitleValueFromDomInput, listOfTodos);
-      clear_InputTextAndLocalStorage();
-    }
+
+  const isStringValid = isStringNotNumberAndNotEmpty(todoTitle_Value_FromDomInput);
+
+  if (isStringValid) {
+    create_TodoFromTextAndAddToList(todoTitle_Value_FromDomInput, listOfTodos);
+    clear_InputTextAndLocalStorage();
     save_ListOfTodo();
     render_TodoListInContainer(listOfTodos, domListOfTodos);
     disableOrEnable_CreateTodoButtonOnTodoInputTitle();
