@@ -13,4 +13,7 @@ function eatBagel(numberOfBagels) {
 
 eatBagel(numberOfBagels);
 eatBagel(numberOfBagels);
+eatBagel(numberOfBagels);
+eatBagel(numberOfBagels);
+
 console.log('> \t : numberOfBagels =', numberOfBagels);

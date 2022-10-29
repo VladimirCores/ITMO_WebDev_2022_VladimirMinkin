@@ -10,7 +10,7 @@ showBeans(); // [ 'adzuki', 'soy', 'lima' ]
 
 beans = ['pinto ', 'kidney'];
 showBeans(); // [ 'pinto ', 'kidney' ]
-
+console.log('> saved', beans);
 /*
  * function showBeans() {
  *  console.log(...);

@@ -23,4 +23,4 @@ function makeSandwich() {
   return bread + meat + getCheese();
 }
 
-console.log('> \t : makeSandwich() =', makeSandwich());
+console.log('> \t : makeSandwich() =', makeSandwich()); // sourdough spam and eggs swiss sriracha

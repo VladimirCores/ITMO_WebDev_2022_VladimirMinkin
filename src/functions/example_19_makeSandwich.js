@@ -1,6 +1,7 @@
 console.log('> Example 19');
 
 let bread = 'sourdough';
+let condiment = ' rake';
 
 function makeSandwich() {
   let meat = ' spam';

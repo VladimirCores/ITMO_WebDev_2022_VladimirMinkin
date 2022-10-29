@@ -3,7 +3,7 @@ console.log('> Example 7');
 let numberOfBagels = 5;
 
 function eatBagel() {
-  numberOfBagels -= 1;
+  numberOfBagels -= 1; // numberOfBagels--;
   if (numberOfBagels === 0) {
     console.log('> \t -> eatBagel: Oh nO, Out Of bagles!');
   } else {
@@ -13,6 +13,7 @@ function eatBagel() {
 
 eatBagel();
 eatBagel();
+
 console.log('> \t :', numberOfBagels);
 
 // Функция eatBagel создает контекст выполнения, который создает локальный "скоуп", при выполнение функции

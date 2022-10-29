@@ -1,18 +1,31 @@
 console.log('> Example 37');
 
-function shoutBeans() {
-  let beans = 'green';
-
+function shoutBeans(type) {
+  let beans = type;
   return function (number) {
     console.log('\t (closure) beans.toUpperCase() =', beans.toUpperCase() + ` number = ${number}`);
   };
 }
 
-let loudBeans = shoutBeans();
+let loudBeans = shoutBeans('blue');
 
 loudBeans();
 loudBeans(1);
 loudBeans(3);
+
+function creatMultiplyBy(number) {
+  return (input) => input * number;
+}
+
+const multiplyBy56 = creatMultiplyBy(56);
+
+let counter = 0;
+
+const handler = () => {
+  console.log(' > multiplyBy56()', multiplyBy56(++counter));
+};
+
+document.onclick = handler;
 
 /*
  * function shoutBeans() {

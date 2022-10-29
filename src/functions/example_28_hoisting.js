@@ -4,5 +4,7 @@ function stringCheese(cheese) {
   let cheese = 'sharp';
   cheese = 'gornoaltajski';
   console.log('> \t -> stringCheese: cheese =', cheese);
+  return cheese;
 }
-stringCheese('babybel'); // Uncaught SyntaxError: Identifier 'cheese' has already been declared
+
+const abd = stringCheese('babybel'); // Uncaught SyntaxError: Identifier 'cheese' has already been declared

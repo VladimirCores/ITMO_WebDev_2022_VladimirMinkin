@@ -14,6 +14,7 @@ function makeSandwich() {
     }
 
     condiment();
+
     return cheese + condiment;
   }
 

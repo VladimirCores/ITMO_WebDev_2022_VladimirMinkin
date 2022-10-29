@@ -1,5 +1,7 @@
 console.log('> Example 13');
 
+console.log('> \t : init pecan =', pecan);
+
 if (true) {
   var pecan = 'sandie';
 }

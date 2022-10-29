@@ -5,14 +5,15 @@ let numberOfBagels = 5;
 function eatBagel(bagels) {
   bagels -= 1;
   if (bagels === 0) {
-    console.log('> \t -> eatBagel: Oh nO, Out Of bagles!');
+    console.log('> \t -> eatBagel: Oh nO, Out Of bagles!', numberOfBagels);
   } else {
-    console.log(`> \t -> eatBagel: Yummy. There are ${bagels} left!`);
+    console.log(`> \t -> eatBagel: Yummy. There are ${bagels} left!`, numberOfBagels);
   }
 }
 
 eatBagel(numberOfBagels);
 eatBagel(numberOfBagels);
+
 console.log('> \t :', numberOfBagels);
 
 // В данном случае параметр функции bagels создается (определяется) как локальная переменная

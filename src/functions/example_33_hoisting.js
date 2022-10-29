@@ -8,7 +8,7 @@ function teaTime() {
   console.log('> \t -> teaTime: custard tart');
 }
 
-// Uncaught TypeError: teaTime is not a function
+// Uncaught SyntaxError: Identifier 'teaTime' has already been declared
 
 /*
  * function teaTime() {
