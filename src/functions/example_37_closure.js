@@ -2,27 +2,38 @@ console.log('> Example 37');
 
 function shoutBeans(type) {
   let beans = type;
+  let logMessage = '(closure) beans.toUpperCase() =';
+
   return function (number) {
-    console.log('\t (closure) beans.toUpperCase() =', beans.toUpperCase() + ` number = ${number}`);
+    console.log(`\t ${logMessage}`, beans.toUpperCase() + ` number = ${number}`);
   };
 }
 
+const type = { name: 'blue' };
 let loudBeans = shoutBeans('blue');
 
 loudBeans();
 loudBeans(1);
 loudBeans(3);
 
-function creatMultiplyBy(number) {
+function createMultiplyBy(number) {
   return (input) => input * number;
 }
 
-const multiplyBy56 = creatMultiplyBy(56);
+function createWelcomeMessage(message) {
+  return (input) => message + ': ' + input;
+}
+
+const multiplyBy56 = createMultiplyBy(56);
+const welcomeGuestToOurFestival = createWelcomeMessage('Welcome guest to our festival');
 
 let counter = 0;
 
 const handler = () => {
-  console.log(' > multiplyBy56()', multiplyBy56(++counter));
+  console.log(` > multiplyBy56(${++counter})`, multiplyBy56(counter));
+  console.log(` > welcomeGuestToOurFestival`, welcomeGuestToOurFestival('Vladimir'));
+  console.log(` > welcomeGuestToOurFestival`, welcomeGuestToOurFestival('Dmitry'));
+  console.log(` > welcomeGuestToOurFestival`, welcomeGuestToOurFestival('Arthur'));
 };
 
 document.onclick = handler;

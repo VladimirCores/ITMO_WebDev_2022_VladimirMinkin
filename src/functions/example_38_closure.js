@@ -11,6 +11,7 @@ function shoutBeans() {
 let loudBeans = shoutBeans();
 
 beans = 'chickpea';
+
 loudBeans();
 
 /*

@@ -7,13 +7,15 @@ function shoutBeans() {
 
   return function () {
     let beans = 'red';
-    console.log('> \t (closure) beans.toUpperCase() =', beans.toUpperCase(), this.beans);
+    console.log('> \t (closure) beans.toUpperCase() =', beans.toUpperCase());
   };
 }
 
 let loudBeans = shoutBeans();
 
 loudBeans();
+
+// Uncaught TypeError: Cannot read properties of undefined (reading 'beans')
 
 // this.beans = beans;
 //

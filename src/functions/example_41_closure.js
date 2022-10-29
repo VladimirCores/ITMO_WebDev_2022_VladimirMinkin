@@ -10,7 +10,11 @@ function shoutBeans() {
 }
 
 let loudBeans = shoutBeans();
+
+console.log('> \t : beans before =', beans);
+
 loudBeans();
+
 console.log('> \t : beans =', beans);
 
 /*
