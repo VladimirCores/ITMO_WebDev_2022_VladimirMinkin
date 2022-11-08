@@ -10,6 +10,7 @@ const domListOfTodos = document.getElementById('listOfTodos');
 
 let selectedTodoVO = null;
 let selectedTodoViewItem = null;
+const hasSelectedTodo = () => !!selectedTodoVO;
 
 domBtnCreateTodo.addEventListener('click', onBtnCreateTodoClick);
 domInpTodoTitle.addEventListener('keyup', onInpTodoTitleKeyup);
@@ -29,23 +30,21 @@ disableOrEnable_CreateTodoButtonOnTodoInputTitle();
 
 function onTodoDomItemClicked(event) {
   const domElement = event.target;
-  // console.log('> onTodoDomItemClicked click -> dataset:', target.dataset);
-  if (domElement.dataset['type'] !== TodoView.TODO_VIEW_ITEM) return;
+  if (!TodoView.isDomElementMatch(domElement)) return;
 
-  const SELECTED_ITEM_BACKGROUND_KEY = 'lightgray';
+  const clickedTodoVO = listOfTodos.find((vo) => vo.id === domElement.id);
+  const isCurrentTodoSelected = selectedTodoVO === clickedTodoVO;
 
-  const todoId = domElement.id;
-  const todoVO = listOfTodos.find((vo) => vo.id === todoId);
+  if (hasSelectedTodo()) resetSelectedTodo();
 
-  const isSelected = domElement.style.backgroundColor === SELECTED_ITEM_BACKGROUND_KEY;
+  if (!isCurrentTodoSelected) {
+    selectedTodoVO = clickedTodoVO;
+    selectedTodoViewItem = domElement;
 
-  if (isSelected) {
-    domInpTodoTitle.value = '';
-    domElement.style.backgroundColor = '';
-  } else {
-    selectedTodoVO = todoVO;
-    domInpTodoTitle.value = todoVO.title;
-    domElement.style.backgroundColor = SELECTED_ITEM_BACKGROUND_KEY;
+    domBtnCreateTodo.innerText = 'Update';
+    domInpTodoTitle.value = clickedTodoVO.title;
+    selectedTodoViewItem.style.backgroundColor = 'lightgray';
+    onInpTodoTitleKeyup();
   }
 }
 
@@ -82,13 +81,13 @@ function onInpTodoTitleKeyup() {
   // console.log('> onInpTodoTitleKeyup:', event);
   const inputValue = domInpTodoTitle.value;
   // console.log('> onInpTodoTitleKeyup:', inputValue);
-  if (selectedTodoVO == null) {
-    localStorage.setItem(LOCAL_INPUT_TEXT, inputValue);
-    disableOrEnable_CreateTodoButtonOnTodoInputTitle();
-  } else {
+  if (hasSelectedTodo()) {
     disableOrEnable_CreateTodoButtonOnTodoInputTitle(() => {
       return isStringNotNumberAndNotEmpty(inputValue) && selectedTodoVO.title !== inputValue;
     });
+  } else {
+    localStorage.setItem(LOCAL_INPUT_TEXT, inputValue);
+    disableOrEnable_CreateTodoButtonOnTodoInputTitle();
   }
 }
 
@@ -106,7 +105,7 @@ function resetSelectedTodo() {
   console.log('> resetSelectedTodo -> selectedTodoVO:', selectedTodoVO);
   domBtnCreateTodo.innerText = 'Create';
   domInpTodoTitle.value = localStorage.getItem(LOCAL_INPUT_TEXT);
-  if (selectedTodoViewItem) selectedTodoViewItem.style.backgroundColor = '';
+  selectedTodoViewItem.style.backgroundColor = '';
   selectedTodoVO = null;
   selectedTodoViewItem = null;
   disableOrEnable_CreateTodoButtonOnTodoInputTitle();

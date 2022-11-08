@@ -2,7 +2,7 @@
 /** @type {import('vite').UserConfig} */
 import path from 'path';
 import { defineConfig } from 'vite';
-import mkcert from 'vite-plugin-mkcert';
+// import mkcert from 'vite-plugin-mkcert';
 
 export default defineConfig({
   // omit
