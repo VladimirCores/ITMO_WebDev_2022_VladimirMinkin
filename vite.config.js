@@ -13,6 +13,7 @@ export default defineConfig({
     },
   },
   server: {
+    host: '127.0.0.1',
     port: 8089,
     // cors: true,
     // host: 'local.dev',

@@ -15,7 +15,6 @@ class TodoView {
       >
         <input
           type="checkbox" 
-          data-test="todo-checker"
           id="${index}" 
           ${checked}
         >${vo.title}

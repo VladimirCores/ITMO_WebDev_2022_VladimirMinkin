@@ -22,6 +22,7 @@ const LOCAL_INPUT_TEXT = 'inputText';
 
 const listOfTodos = localStorageListOf(LOCAL_LIST_OF_TODOS);
 
+console.log('> Initial env:', import.meta.env);
 console.log('> Initial value -> listOfTodos', listOfTodos);
 
 domInpTodoTitle.value = localStorage.getItem(LOCAL_INPUT_TEXT);
