@@ -31,4 +31,12 @@ describe('Test - todo creation - on index page ', () => {
     cy.reload(true);
     checkChildrenExist();
   });
+
+  it('create todo and validate selection rules', () => {
+    ['Todo 1', 'Todo 2'].forEach((item) => {
+      cy.get('#inpTodoTitle').type(item);
+      cy.get('#btnCreateTodo').click();
+    });
+    const todoListChildren = cy.get('#listOfTodos').children();
+  });
 });
