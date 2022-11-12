@@ -30,3 +30,7 @@ Cypress.Commands.add('checkInputExistAndEmpty', () => {
   cyInputTodoTitle.should('contain.text', '');
   cy.get('#btnCreateTodo').should('be.disabled');
 });
+
+Cypress.Commands.add('getByID', (id) => {
+  return cy.get(`#${id}`);
+});
