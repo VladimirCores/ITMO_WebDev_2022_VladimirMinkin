@@ -41,7 +41,7 @@ describe('Test - todo creation - on index page ', () => {
   });
 
   it('create todo and validate selection rules', () => {
-    ['Todo 1', 'Todo 2'].forEach(createTodo);
+    ['Todo 1', 'Todo 2', 'Todo 3'].forEach(createTodo);
 
     cy.get(`#${DOM.INPUT_TODO_TITLE}`).clear();
 
