@@ -12,7 +12,12 @@ let selectedTodoVO = null;
 let selectedTodoViewItem = null;
 const hasSelectedTodo = () => !!selectedTodoVO;
 
-domBtnCreateTodo.addEventListener('click', onBtnCreateTodoClick);
+const debug = console.log;
+console.log = (...args) => {
+  if (import.meta.env.DEV) debug(...args);
+};
+
+domBtnCreateTodo.addEventListener('click', (e) => onBtnCreateTodoClick().then());
 domInpTodoTitle.addEventListener('keyup', onInpTodoTitleKeyup);
 domListOfTodos.addEventListener('change', onTodoListChange);
 domListOfTodos.addEventListener('click', onTodoDomItemClicked);
@@ -24,6 +29,16 @@ const listOfTodos = localStorageListOf(LOCAL_LIST_OF_TODOS);
 
 console.log('> Initial env:', import.meta.env);
 console.log('> Initial value -> listOfTodos', listOfTodos);
+
+const delay = (time) =>
+  new Promise((resolve, reject) => {
+    console.log('> delay -> created');
+    // document.getElementById('spinner').style.display = 'block';
+    setTimeout(() => {
+      console.log('> delay -> setTimeout: ready');
+      resolve(time);
+    }, time);
+  });
 
 domInpTodoTitle.value = localStorage.getItem(LOCAL_INPUT_TEXT);
 render_TodoListInContainer(listOfTodos, domListOfTodos);
@@ -62,7 +77,7 @@ function onTodoListChange(event) {
   }
 }
 
-function onBtnCreateTodoClick(event) {
+async function onBtnCreateTodoClick(event) {
   // console.log('> domBtnCreateTodo -> handle(click)', this.attributes);
   const todoTitle_Value_FromDomInput = domInpTodoTitle.value;
   // console.log('> domBtnCreateTodo -> todoInputTitleValue:', todoTitleValueFromDomInput);
@@ -70,11 +85,26 @@ function onBtnCreateTodoClick(event) {
   const isStringValid = isStringNotNumberAndNotEmpty(todoTitle_Value_FromDomInput);
 
   if (isStringValid) {
+    // const result = await delay(1000).then((param) => {
+    //   console.log('> delay -> then: data 1', param);
+    //   return { time: param * 2 };
+    // });
+    // .then((param) => {
+    //   console.log('> delay -> then: data 2', param);
+    //   return `time = ${param}`;
+    // });
+
+    console.log('> result ->', result);
+
+    Promise.all([]).then();
+
+    // delay(1000).then(() => {
     create_TodoFromTextAndAddToList(todoTitle_Value_FromDomInput, listOfTodos);
     clear_InputTextAndLocalStorage();
     save_ListOfTodo();
     render_TodoListInContainer(listOfTodos, domListOfTodos);
     disableOrEnable_CreateTodoButtonOnTodoInputTitle();
+    // });
   }
 }
 

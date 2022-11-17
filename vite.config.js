@@ -19,4 +19,11 @@ export default defineConfig({
     // host: 'local.dev',
     // https: true,
   },
+  build: {
+    minify: false,
+  },
+  // esbuild: {
+  //   drop: ['debugger'],
+  //   pure: ['console.log', 'console.error', 'console.warn', 'console.debug', 'console.trace'],
+  // },
 });
