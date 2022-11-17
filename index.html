@@ -5,31 +5,9 @@
     <link href="/vite.svg" rel="icon" type="image/svg+xml" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Todo App</title>
-    <style>
-      .spinner {
-        margin: 30px auto;
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        border: 2px solid #ccc;
-        animation: spin 1.5s linear infinite;
-      }
-      .spinner {
-        border-bottom-color: red;
-      }
-      @keyframes spin {
-        from {
-          transform: rotate(0);
-        }
-        to {
-          transform: rotate(360deg);
-        }
-      }
-    </style>
   </head>
   <body>
-    <div id="app">
-      <div id="spinner" class="spinner" style="display: none"></div>
+    <div id="app" style="visibility: hidden">
       <input id="inpTodoTitle" />
       <button id="btnCreateTodo">Create</button>
       <ol id="listOfTodos"></ol>

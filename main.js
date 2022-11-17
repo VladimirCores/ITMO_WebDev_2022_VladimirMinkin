@@ -3,10 +3,13 @@ import { disableButtonWhenTextInvalid } from '@/utils/domUtils.js';
 import { isStringNotNumberAndNotEmpty } from '@/utils/stringUtils.js';
 import { localStorageListOf, localStorageSaveListOfWithKey } from '@/utils/databaseUtils.js';
 import TodoView from '@/view/TodoView.js';
+import ServerService from '@/services/ServerService.js';
 
-const domInpTodoTitle = document.getElementById('inpTodoTitle');
-const domBtnCreateTodo = document.getElementById('btnCreateTodo');
-const domListOfTodos = document.getElementById('listOfTodos');
+const $ = document.getElementById.bind(document);
+
+const domInpTodoTitle = $('inpTodoTitle');
+const domBtnCreateTodo = $('btnCreateTodo');
+const domListOfTodos = $('listOfTodos');
 
 let selectedTodoVO = null;
 let selectedTodoViewItem = null;
@@ -17,32 +20,29 @@ console.log = (...args) => {
   if (import.meta.env.DEV) debug(...args);
 };
 
-domBtnCreateTodo.addEventListener('click', (e) => onBtnCreateTodoClick().then());
-domInpTodoTitle.addEventListener('keyup', onInpTodoTitleKeyup);
-domListOfTodos.addEventListener('change', onTodoListChange);
-domListOfTodos.addEventListener('click', onTodoDomItemClicked);
-
 const LOCAL_LIST_OF_TODOS = 'listOfTodos';
 const LOCAL_INPUT_TEXT = 'inputText';
 
-const listOfTodos = localStorageListOf(LOCAL_LIST_OF_TODOS);
+let listOfTodos = [];
 
-console.log('> Initial env:', import.meta.env);
-console.log('> Initial value -> listOfTodos', listOfTodos);
+const serverService = new ServerService(import.meta.env.VITE_DATA_SERVER);
 
-const delay = (time) =>
-  new Promise((resolve, reject) => {
-    console.log('> delay -> created');
-    // document.getElementById('spinner').style.display = 'block';
-    setTimeout(() => {
-      console.log('> delay -> setTimeout: ready');
-      resolve(time);
-    }, time);
-  });
+serverService.requestTodos().then((todoList) => {
+  console.log('> Initial env:', import.meta.env);
+  console.log('> Initial value -> todoList', todoList);
 
-domInpTodoTitle.value = localStorage.getItem(LOCAL_INPUT_TEXT);
-render_TodoListInContainer(listOfTodos, domListOfTodos);
-disableOrEnable_CreateTodoButtonOnTodoInputTitle();
+  listOfTodos = todoList;
+  domInpTodoTitle.value = localStorage.getItem(LOCAL_INPUT_TEXT);
+  render_TodoListInContainer(listOfTodos, domListOfTodos);
+  disableOrEnable_CreateTodoButtonOnTodoInputTitle();
+
+  $('app').style.visibility = 'visible';
+});
+
+domBtnCreateTodo.addEventListener('click', onBtnCreateTodoClick);
+domInpTodoTitle.addEventListener('keyup', onInpTodoTitleKeyup);
+domListOfTodos.addEventListener('change', onTodoListChange);
+domListOfTodos.addEventListener('click', onTodoDomItemClicked);
 
 function onTodoDomItemClicked(event) {
   const domElement = event.target;
@@ -85,26 +85,11 @@ async function onBtnCreateTodoClick(event) {
   const isStringValid = isStringNotNumberAndNotEmpty(todoTitle_Value_FromDomInput);
 
   if (isStringValid) {
-    // const result = await delay(1000).then((param) => {
-    //   console.log('> delay -> then: data 1', param);
-    //   return { time: param * 2 };
-    // });
-    // .then((param) => {
-    //   console.log('> delay -> then: data 2', param);
-    //   return `time = ${param}`;
-    // });
-
-    console.log('> result ->', result);
-
-    Promise.all([]).then();
-
-    // delay(1000).then(() => {
     create_TodoFromTextAndAddToList(todoTitle_Value_FromDomInput, listOfTodos);
     clear_InputTextAndLocalStorage();
     save_ListOfTodo();
     render_TodoListInContainer(listOfTodos, domListOfTodos);
     disableOrEnable_CreateTodoButtonOnTodoInputTitle();
-    // });
   }
 }
 
