@@ -22,7 +22,6 @@ class TodoServerService {
       const listOfTodos = await fetch(this.path, {
         method: 'GET',
       }).then((response) => processResponse(response, 'requestTodos'));
-
       console.log(`> ServerService -> requestTodos: listOfTodos =`, listOfTodos);
       return listOfTodos;
     } catch (error) {
@@ -44,11 +43,14 @@ class TodoServerService {
         throw error;
       });
   }
+
   async deleteTodo(id) {
-    return fetch(`${this.path}/${id}`, { method: 'DELETE' })
+    return fetch(`${this.path}/${id}`, {
+      method: 'DELETE',
+    })
       .then((response) => processResponse(response, 'deleteTodo'))
       .catch((error) => {
-        console.log(`> ServerService -> saveTodo: error = ${error}`);
+        console.log(`> ServerService -> deleteTodo: error = ${error}`);
         throw error;
       });
   }

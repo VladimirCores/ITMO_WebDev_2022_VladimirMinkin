@@ -32,10 +32,10 @@ todoServerService
   })
   .catch((error) => {
     $(Dom.APP).innerHTML = `
-    <div id="errorOnInit">
-      <h1>Problem with server</h1>
-      <p style="color:red">${error.toString()}<p>
-    </div>`;
+      <div id="errorOnInit">
+        <h1>Problem with server</h1>
+        <p style="color:red">${error.toString()}<p>
+      </div>`;
   })
   .finally(() => ($(Dom.APP).style.visibility = 'visible'));
 
@@ -47,18 +47,25 @@ $(Dom.LIST_OF_TODOS).addEventListener('click', onTodoDomItemClicked);
 async function onTodoDomItemClicked(event) {
   const domElement = event.target;
   console.log('> onTodoDomItemClicked', domElement);
+
   if (!TodoView.isDomElementMatch(domElement)) {
-    if (TodoView.isDomElementMatchDeleteButton(domElement)) {
-      const deleteTodoVO = findTodoById(TodoView.getTodoIdFromDeleteButton(domElement));
-      console.log('> onTodoDomItemClicked: parentNode =', parentNode);
-      if (confirm(`Delete ${deleteTodoVO.title}?`)) {
-        await todoServerService
-          .deleteTodo(deleteTodoVO.id)
+    const isDeleteButton = TodoView.isDomElementDeleteButton(domElement);
+    console.log('> \t isDeleteButton:', isDeleteButton);
+    if (isDeleteButton) {
+      const todoId = TodoView.getTodoIdFromDeleteButton(domElement);
+      console.log('> \t todoId:', todoId);
+      const todoVO = findTodoById(todoId);
+      if (todoVO && confirm(`Delete: ${todoVO.title}?`)) {
+        console.log('> \t Delete confirmed:', todoVO);
+        domElement.disabled = true;
+        todoServerService
+          .deleteTodo(todoId)
           .then(() => {
-            listOfTodos.splice(listOfTodos.indexOf(deleteTodoVO), 1);
+            console.log('> \t Deleted', todoVO);
+            listOfTodos.splice(listOfTodos.indexOf(todoVO), 1);
             render_TodoListInContainer(listOfTodos, $(Dom.LIST_OF_TODOS));
           })
-          .catch(alert);
+          .catch(() => {});
       }
     }
     return;
@@ -136,6 +143,7 @@ function render_TodoListInContainer(listOfTodoVO, container) {
     todoVO = listOfTodoVO[index];
     output += TodoView.createSimpleViewFromVO(index, todoVO);
   }
+
   container.innerHTML = output;
 }
 
