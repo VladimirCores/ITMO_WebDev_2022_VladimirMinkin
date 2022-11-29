@@ -1,5 +1,5 @@
 <template>
-  <p class="value">
+  <p class="value" :class="{ alert: isAlert }">
     <span style="color: blue"> {{ title }} </span>: {{ value }}
   </p>
 </template>
@@ -9,12 +9,27 @@ export default {
     title: '',
     value: 0,
   },
+  computed: {
+    isAlert() {
+      return this.value >= 10;
+    },
+  },
+  mounted() {
+    console.log('> CounterValue -> mounted', this.$props);
+  },
+  unmounted() {
+    console.log('> CounterValue -> unmounted');
+  },
 };
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .value {
   color: red;
   font-size: 2rem;
   font-weight: normal;
+
+  &.alert {
+    background-color: lightcoral;
+  }
 }
 </style>
