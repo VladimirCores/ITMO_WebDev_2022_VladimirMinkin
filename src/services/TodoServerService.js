@@ -17,13 +17,11 @@ class TodoServerService {
   }
 
   async requestTodos() {
-    console.log(`> ServerService -> requestTodos`);
+    console.log(`> ServerService -> requestTodos: path =`, this.path);
     try {
-      const listOfTodos = await fetch(this.path, {
+      return await fetch(this.path, {
         method: 'GET',
       }).then((response) => processResponse(response, 'requestTodos'));
-      console.log(`> ServerService -> requestTodos: listOfTodos =`, listOfTodos);
-      return listOfTodos;
     } catch (error) {
       console.log(`> ServerService -> requestTodos: error = ${error}`);
       throw error;
@@ -51,6 +49,19 @@ class TodoServerService {
       .then((response) => processResponse(response, 'deleteTodo'))
       .catch((error) => {
         console.log(`> ServerService -> deleteTodo: error = ${error}`);
+        throw error;
+      });
+  }
+
+  async updateTodo(todoVO) {
+    return fetch(`${this.path}/${todoVO.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(todoVO),
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((response) => processResponse(response, 'updateTodo'))
+      .catch((error) => {
+        console.log(`> ServerService -> updateTodo: error = ${error}`);
         throw error;
       });
   }

@@ -1,6 +1,6 @@
 class TodoVO {
-  static createFromTitle(title) {
-    const todoId = Date.now().toString();
+  static createFromTitle(title, id) {
+    const todoId = id ?? Date.now().toString();
     return new TodoVO(todoId, title);
   }
 

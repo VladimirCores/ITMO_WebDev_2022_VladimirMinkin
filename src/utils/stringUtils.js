@@ -3,13 +3,15 @@ function isStringNotNumberAndNotEmpty(value) {
   if (value === undefined) throw new Error('Undefined value is not allowed');
   const isValueString = typeof value === 'string';
   const isValueNotNumber = isNaN(parseInt(value));
+  const isStringNotEmpty = value.length > 0;
 
-  const result = isValueString && isValueNotNumber && value.length > 0;
+  const result = isValueString && isValueNotNumber && isStringNotEmpty;
 
-  console.log('> isStringNotNumberAndNotEmpty -> result', {
+  console.log('> isStringNotNumberAndNotEmpty -> result:', {
     result,
-    isInputValueString: isValueString,
-    isInputValeNotNumber: isValueNotNumber,
+    isValueString,
+    isStringNotEmpty,
+    isValueNotNumber,
   });
   return result;
 }

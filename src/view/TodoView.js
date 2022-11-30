@@ -1,17 +1,65 @@
+const setDisabledToListItems = (domTodoView, list, isDisabled) =>
+  list.forEach((key) => {
+    TodoView.getChildFromTodoViewByType(domTodoView, key).disabled = isDisabled;
+  });
+
 class TodoView {
   static TODO_VIEW_ITEM = 'todo-item';
-  static TODO_VIEW_ITEM_DETELE = 'todo-item-delete';
+  static TODO_VIEW_ITEM_DELETE = 'todo-item-delete';
+  static TODO_VIEW_ITEM_COMPLETE = 'todo-item-complete';
+
+  static TODO_VIEW_LIST_OF_DISABLEABLE = [TodoView.TODO_VIEW_ITEM_COMPLETE, TodoView.TODO_VIEW_ITEM_DELETE];
 
   static isDomElementMatch(domElement) {
     return domElement.dataset.type === TodoView.TODO_VIEW_ITEM;
   }
 
   static isDomElementDeleteButton(domElement) {
-    return domElement.dataset.type === TodoView.TODO_VIEW_ITEM_DETELE;
+    return domElement.dataset.type === TodoView.TODO_VIEW_ITEM_DELETE;
+  }
+
+  static isDomElementCompleteCheckbox(domElement) {
+    return domElement.dataset.type === TodoView.TODO_VIEW_ITEM_COMPLETE;
+  }
+
+  static getTodoViewFromDeleteButton(domDeleteButton) {
+    return domDeleteButton.parentNode;
+  }
+
+  static getTodoViewFromCompleteCheckbox(domCheckbox) {
+    return domCheckbox.parentNode;
   }
 
   static getTodoIdFromDeleteButton(domDeleteButton) {
-    return domDeleteButton.parentNode.id;
+    return TodoView.getTodoViewFromDeleteButton(domDeleteButton).id;
+  }
+
+  static getTodoIdFromCompleteCheckbox(domCheckbox) {
+    return TodoView.getTodoViewFromCompleteCheckbox(domCheckbox).id;
+  }
+
+  static disableTodoListItem(domTodoView) {
+    domTodoView.style.pointerEvents = 'none';
+    domTodoView.style.color = 'gray';
+    setDisabledToListItems(domTodoView, TodoView.TODO_VIEW_LIST_OF_DISABLEABLE, true);
+  }
+
+  static enableTodoListItem(domTodoView) {
+    domTodoView.style.pointerEvents = '';
+    domTodoView.style.color = 'black';
+    setDisabledToListItems(domTodoView, TodoView.TODO_VIEW_LIST_OF_DISABLEABLE, false);
+  }
+
+  static getChildFromTodoViewByType(domTodoView, type) {
+    return domTodoView.querySelector(`[data-type="${type}"]`);
+  }
+
+  static addHighlightTodoView(domTodoView) {
+    domTodoView.style.backgroundColor = 'lightgray';
+  }
+
+  static removeHighlightTodoView(domTodoView) {
+    domTodoView.style.backgroundColor = '';
   }
 
   static createSimpleViewFromVO(index, vo) {
@@ -24,11 +72,11 @@ class TodoView {
       >
         <input
           type="checkbox" 
-          id="${index}" 
+          data-type="${TodoView.TODO_VIEW_ITEM_COMPLETE}" 
           ${checked}
         >${vo.title}
         <button
-          data-type="${TodoView.TODO_VIEW_ITEM_DETELE}" 
+          data-type="${TodoView.TODO_VIEW_ITEM_DELETE}" 
           class="delete-button" 
           style="position: absolute; right: 0; top: 0;"
         >x</button>

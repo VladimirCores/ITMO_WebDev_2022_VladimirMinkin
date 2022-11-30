@@ -1,48 +1,46 @@
-import { LOCAL_LIST_OF_TODOS, LOCAL_INPUT_TEXT } from '@/consts/local';
+import { LOCAL_INPUT_TEXT } from '@/consts/local';
 import Dom from '@/consts/dom';
 import TodoVO from '@/model/vos/TodoVO.js';
 import { disableButtonWhenTextInvalid } from '@/utils/domUtils.js';
 import { isStringNotNumberAndNotEmpty } from '@/utils/stringUtils.js';
-import { localStorageSaveListOfWithKey } from '@/utils/databaseUtils.js';
 import { $, wrapDevOnlyConsoleLog } from '@/utils/generalUtils.js';
 import TodoView from '@/view/TodoView.js';
 import TodoServerService from '@/services/TodoServerService.js';
+import ErrorView from '@/view/ErrorView.js';
 
 let listOfTodos = [];
 let selectedTodoVO = null;
 let selectedTodoViewItem = null;
-
 const todoServerService = new TodoServerService(import.meta.env.VITE_DATA_SERVER_ADDRESS);
 
+const isTodoSelected = (todoVO) => hasSelectedTodo() && selectedTodoVO === todoVO;
 const hasSelectedTodo = () => !!selectedTodoVO;
 const findTodoById = (id) => listOfTodos.find((vo) => vo.id === id);
+const findTodoIndex = (todoVO) => listOfTodos.indexOf(todoVO);
+const addTodo = (todoVO) => listOfTodos.push(todoVO);
+const removeTodo = (todoVO) => listOfTodos.splice(findTodoIndex(todoVO), 1);
+const replaceTodo = (todoVO, newTodoVO) => listOfTodos.splice(findTodoIndex(todoVO), 1, newTodoVO);
 
 wrapDevOnlyConsoleLog();
 
 todoServerService
   .requestTodos()
-  .then((todoList) => {
-    console.log('> Initial env:', import.meta.env);
-    console.log('> Initial value:', todoList);
-
-    listOfTodos = todoList;
-    $(Dom.INPUT_TODO_TITLE).value = localStorage.getItem(LOCAL_INPUT_TEXT);
-    render_TodoListInContainer(listOfTodos, $(Dom.LIST_OF_TODOS));
-    disableOrEnable_CreateTodoButtonOnTodoInputTitle();
-  })
-  .catch((error) => {
-    $(Dom.APP).innerHTML = `
-      <div id="errorOnInit">
-        <h1>Problem with server</h1>
-        <p style="color:red">${error.toString()}<p>
-      </div>`;
-  })
+  .then(initializeTodoListAndRender)
+  .catch((error) => ($(Dom.APP).innerHTML = ErrorView.createTodoListRetrieveError(error)))
   .finally(() => ($(Dom.APP).style.visibility = 'visible'));
 
 $(Dom.BTN_CREATE_TODO).addEventListener('click', onBtnCreateTodoClick);
 $(Dom.INPUT_TODO_TITLE).addEventListener('keyup', onInpTodoTitleKeyup);
 $(Dom.LIST_OF_TODOS).addEventListener('change', onTodoListChange);
 $(Dom.LIST_OF_TODOS).addEventListener('click', onTodoDomItemClicked);
+
+function initializeTodoListAndRender(todoList) {
+  console.log('> initializeTodoList:', todoList);
+  listOfTodos = todoList;
+  $(Dom.INPUT_TODO_TITLE).value = localStorage.getItem(LOCAL_INPUT_TEXT);
+  disableEnable_CreateTodoButtonOnTitleText();
+  render_TodoListInContainer();
+}
 
 async function onTodoDomItemClicked(event) {
   const domElement = event.target;
@@ -57,127 +55,141 @@ async function onTodoDomItemClicked(event) {
       const todoVO = findTodoById(todoId);
       if (todoVO && confirm(`Delete: ${todoVO.title}?`)) {
         console.log('> \t Delete confirmed:', todoVO);
-        domElement.disabled = true;
+        const todoView = TodoView.getTodoViewFromDeleteButton(domElement);
+        TodoView.disableTodoListItem(todoView);
+        if (isTodoSelected(todoVO)) {
+          reset_SelectedTodo();
+        }
         todoServerService
           .deleteTodo(todoId)
           .then(() => {
             console.log('> \t Deleted', todoVO);
-            listOfTodos.splice(listOfTodos.indexOf(todoVO), 1);
-            render_TodoListInContainer(listOfTodos, $(Dom.LIST_OF_TODOS));
+            removeTodo(todoVO);
+            render_TodoListInContainer();
           })
-          .catch(() => {});
+          .catch(alert);
       }
     }
     return;
   }
 
   const clickedTodoVO = findTodoById(domElement.id);
-  const isCurrentTodoSelected = selectedTodoVO === clickedTodoVO;
+  const isCurrentTodoSelected = selectedTodoVO?.id === clickedTodoVO.id;
 
-  if (hasSelectedTodo()) resetSelectedTodo();
+  if (hasSelectedTodo()) reset_SelectedTodo();
 
   if (!isCurrentTodoSelected) {
     selectedTodoVO = clickedTodoVO;
     selectedTodoViewItem = domElement;
-
+    TodoView.addHighlightTodoView(selectedTodoViewItem);
     $(Dom.BTN_CREATE_TODO).innerText = 'Update';
     $(Dom.INPUT_TODO_TITLE).value = clickedTodoVO.title;
-    selectedTodoViewItem.style.backgroundColor = 'lightgray';
-    onInpTodoTitleKeyup();
+    checkDisable_CreateTodoButtonFromInput(clickedTodoVO.title);
   }
 }
 
-function onTodoListChange(event) {
+async function onTodoListChange(event) {
   console.log('> onTodoListChange -> event:', event);
   const target = event.target;
-  const index = target.id;
-  if (index && typeof index === 'string') {
-    const indexInt = parseInt(index.trim());
-    const todoVO = listOfTodos[indexInt];
-    console.log('> onTodoListChange -> todoVO:', indexInt, todoVO);
+  if (TodoView.isDomElementCompleteCheckbox(target)) {
+    const todoView = TodoView.getTodoViewFromCompleteCheckbox(target);
+    const todoId = TodoView.getTodoIdFromCompleteCheckbox(target);
+    const todoVO = findTodoById(todoId);
+    console.log('> onTodoListChange -> todoVO:', todoId, todoVO);
     todoVO.isCompleted = !!target.checked;
-    save_ListOfTodo();
-  }
-}
-
-async function onBtnCreateTodoClick(event) {
-  // console.log('> domBtnCreateTodo -> handle(click)', this.attributes);
-  const todoTitle_Value_FromDomInput = $(Dom.INPUT_TODO_TITLE).value;
-  // console.log('> domBtnCreateTodo -> todoInputTitleValue:', todoTitleValueFromDomInput);
-
-  const isStringValid = isStringNotNumberAndNotEmpty(todoTitle_Value_FromDomInput);
-
-  if (isStringValid) {
-    const todoVO = create_TodoVOFromTextAndAddToList(todoTitle_Value_FromDomInput, listOfTodos);
+    TodoView.disableTodoListItem(todoView);
     await todoServerService
-      .saveTodo(todoVO)
-      .then((data) => {
-        console.log('> domBtnCreateTodo -> onBtnCreateTodoClick: saved =', data);
-        clear_InputTextAndLocalStorage();
-        // save_ListOfTodo();
-        render_TodoListInContainer(listOfTodos, $(Dom.LIST_OF_TODOS));
-        disableOrEnable_CreateTodoButtonOnTodoInputTitle();
+      .updateTodo(todoVO)
+      .then((updatedTodoVO) => {
+        console.log('> onTodoListChange -> updated:', updatedTodoVO);
+        replaceTodo(todoVO, updatedTodoVO);
       })
       .catch(alert);
+    TodoView.enableTodoListItem(todoView);
   }
 }
 
-function onInpTodoTitleKeyup() {
-  // console.log('> onInpTodoTitleKeyup:', event);
+async function onBtnCreateTodoClick() {
+  const titleText = $(Dom.INPUT_TODO_TITLE).value;
+  console.log('> onBtnCreateTodoClick:', { titleText });
+  const isTitleTextValid = isStringNotNumberAndNotEmpty(titleText);
+
+  if (isTitleTextValid) {
+    await createUpdate_TodoWithTitleText(titleText);
+  }
+}
+
+async function onInpTodoTitleKeyup(e) {
   const inputValue = $(Dom.INPUT_TODO_TITLE).value;
-  // console.log('> onInpTodoTitleKeyup:', inputValue);
+  console.log('> onInpTodoTitleKeyup:', inputValue);
+  checkDisable_CreateTodoButtonFromInput(inputValue);
+  if (e.key === 'Enter' && $(Dom.BTN_CREATE_TODO).disabled === false) {
+    await createUpdate_TodoWithTitleText(inputValue);
+  }
+}
+
+function checkDisable_CreateTodoButtonFromInput(inputValue) {
+  console.log('> checkDisable_CreateTodoButtonFromInput:', { inputValue });
   if (hasSelectedTodo()) {
-    disableOrEnable_CreateTodoButtonOnTodoInputTitle(() => {
+    disableEnable_CreateTodoButtonOnTitleText(() => {
       return isStringNotNumberAndNotEmpty(inputValue) && selectedTodoVO.title !== inputValue;
     });
   } else {
     localStorage.setItem(LOCAL_INPUT_TEXT, inputValue);
-    disableOrEnable_CreateTodoButtonOnTodoInputTitle();
+    disableEnable_CreateTodoButtonOnTitleText();
   }
 }
 
-function render_TodoListInContainer(listOfTodoVO, container) {
+function render_TodoListInContainer() {
+  console.log('> render_TodoListInContainer:', { listOfTodos });
   let output = '';
-  let todoVO;
-  for (let index in listOfTodoVO) {
-    todoVO = listOfTodoVO[index];
+  for (let index in listOfTodos) {
+    const todoVO = listOfTodos[index];
     output += TodoView.createSimpleViewFromVO(index, todoVO);
   }
-
-  container.innerHTML = output;
+  $(Dom.LIST_OF_TODOS).innerHTML = output;
 }
 
-function resetSelectedTodo() {
+function reset_SelectedTodo() {
   console.log('> resetSelectedTodo -> selectedTodoVO:', selectedTodoVO);
   $(Dom.BTN_CREATE_TODO).innerText = 'Create';
   $(Dom.INPUT_TODO_TITLE).value = localStorage.getItem(LOCAL_INPUT_TEXT);
-  selectedTodoViewItem.style.backgroundColor = '';
-  selectedTodoVO = null;
+  TodoView.removeHighlightTodoView(selectedTodoViewItem);
+  disableEnable_CreateTodoButtonOnTitleText();
   selectedTodoViewItem = null;
-  disableOrEnable_CreateTodoButtonOnTodoInputTitle();
-}
-
-function create_TodoVOFromTextAndAddToList(input, listOfTodos) {
-  console.log('> create_TodoFromTextAndAddToList -> input =', input);
-  const newTodoVO = TodoVO.createFromTitle(input);
-  listOfTodos.push(newTodoVO);
-  return newTodoVO;
+  selectedTodoVO = null;
 }
 
 function clear_InputTextAndLocalStorage() {
+  console.log('> clear_InputTextAndLocalStorage');
   $(Dom.INPUT_TODO_TITLE).value = '';
   localStorage.removeItem(LOCAL_INPUT_TEXT);
 }
 
-function disableOrEnable_CreateTodoButtonOnTodoInputTitle(validateInputMethod = isStringNotNumberAndNotEmpty) {
-  console.log(
-    '> disableOrEnableCreateTodoButtonOnTodoInputTitle -> domInpTodoTitle.value =',
-    $(Dom.INPUT_TODO_TITLE).value
-  );
+function disableEnable_CreateTodoButtonOnTitleText(validateInputMethod = isStringNotNumberAndNotEmpty) {
   const textToValidate = $(Dom.INPUT_TODO_TITLE).value;
+  console.log('> disableEnable_CreateTodoButtonOnTodoInputTitle:', { textToValidate });
   disableButtonWhenTextInvalid($(Dom.BTN_CREATE_TODO), textToValidate, validateInputMethod);
 }
 
-function save_ListOfTodo() {
-  localStorageSaveListOfWithKey(LOCAL_LIST_OF_TODOS, listOfTodos);
+function createUpdate_TodoWithTitleText(titleText) {
+  return (
+    hasSelectedTodo()
+      ? todoServerService.updateTodo(((selectedTodoVO.title = titleText), selectedTodoVO)).then((updatedTodoVO) => {
+          console.log('> onBtnCreateTodoClick: updated =', updatedTodoVO);
+          replaceTodo(selectedTodoVO, updatedTodoVO);
+          reset_SelectedTodo();
+        })
+      : todoServerService.saveTodo(TodoVO.createFromTitle(titleText)).then((createdTodoVO) => {
+          console.log('> onBtnCreateTodoClick: saved =', createdTodoVO);
+          addTodo(createdTodoVO);
+        })
+  )
+    .catch(alert)
+    .finally(() => {
+      console.log('> onBtnCreateTodoClick: finally');
+      clear_InputTextAndLocalStorage();
+      render_TodoListInContainer();
+      disableEnable_CreateTodoButtonOnTitleText();
+    });
 }
