@@ -13,7 +13,7 @@ let selectedTodoVO = null;
 let selectedTodoViewItem = null;
 const todoServerService = new TodoServerService(import.meta.env.VITE_DATA_SERVER_ADDRESS);
 
-const isTodoSelected = (todoVO) => hasSelectedTodo() && selectedTodoVO === todoVO;
+const isTodoSelected = (todoVO) => hasSelectedTodo() && selectedTodoVO.id === todoVO.id;
 const hasSelectedTodo = () => !!selectedTodoVO;
 const findTodoById = (id) => listOfTodos.find((vo) => vo.id === id);
 const findTodoIndex = (todoVO) => listOfTodos.indexOf(todoVO);
@@ -37,6 +37,7 @@ $(Dom.LIST_OF_TODOS).addEventListener('click', onTodoDomItemClicked);
 function initializeTodoListAndRender(todoList) {
   console.log('> initializeTodoList:', todoList);
   listOfTodos = todoList;
+  $(Dom.LOADER_SPINNER).remove();
   $(Dom.INPUT_TODO_TITLE).value = localStorage.getItem(LOCAL_INPUT_TEXT);
   disableEnable_CreateTodoButtonOnTitleText();
   render_TodoListInContainer();
@@ -46,7 +47,7 @@ async function onTodoDomItemClicked(event) {
   const domElement = event.target;
   console.log('> onTodoDomItemClicked', domElement);
 
-  if (!TodoView.isDomElementMatch(domElement)) {
+  if (!TodoView.isDomElementTodoView(domElement)) {
     const isDeleteButton = TodoView.isDomElementDeleteButton(domElement);
     console.log('> \t isDeleteButton:', isDeleteButton);
     if (isDeleteButton) {
@@ -74,11 +75,11 @@ async function onTodoDomItemClicked(event) {
   }
 
   const clickedTodoVO = findTodoById(domElement.id);
-  const isCurrentTodoSelected = selectedTodoVO?.id === clickedTodoVO.id;
+  const isClickedTodoSelected = isTodoSelected(clickedTodoVO);
 
   if (hasSelectedTodo()) reset_SelectedTodo();
 
-  if (!isCurrentTodoSelected) {
+  if (!isClickedTodoSelected) {
     selectedTodoVO = clickedTodoVO;
     selectedTodoViewItem = domElement;
     TodoView.addHighlightTodoView(selectedTodoViewItem);

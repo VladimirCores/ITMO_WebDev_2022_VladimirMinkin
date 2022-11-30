@@ -10,7 +10,7 @@ class TodoView {
 
   static TODO_VIEW_LIST_OF_DISABLEABLE = [TodoView.TODO_VIEW_ITEM_COMPLETE, TodoView.TODO_VIEW_ITEM_DELETE];
 
-  static isDomElementMatch(domElement) {
+  static isDomElementTodoView(domElement) {
     return domElement.dataset.type === TodoView.TODO_VIEW_ITEM;
   }
 
