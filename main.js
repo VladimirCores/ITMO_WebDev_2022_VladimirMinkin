@@ -174,6 +174,8 @@ function disableEnable_CreateTodoButtonOnTitleText(validateInputMethod = isStrin
 }
 
 function createUpdate_TodoWithTitleText(titleText) {
+  $(Dom.BTN_CREATE_TODO).disabled = true;
+  $(Dom.INPUT_TODO_TITLE).disabled = true;
   return (
     hasSelectedTodo()
       ? todoServerService.updateTodo(((selectedTodoVO.title = titleText), selectedTodoVO)).then((updatedTodoVO) => {
@@ -189,6 +191,8 @@ function createUpdate_TodoWithTitleText(titleText) {
     .catch(alert)
     .finally(() => {
       console.log('> onBtnCreateTodoClick: finally');
+      $(Dom.BTN_CREATE_TODO).disabled = false;
+      $(Dom.INPUT_TODO_TITLE).disabled = false;
       clear_InputTextAndLocalStorage();
       render_TodoListInContainer();
       disableEnable_CreateTodoButtonOnTitleText();
