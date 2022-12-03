@@ -1,23 +1,22 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router';
 import AppTodo from './AppTodo.vue';
+import AppCounter from './AppCounter.vue';
 </script>
 
 <template>
   <header>
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
     <div class="wrapper">
       <AppTodo />
-
-      <nav>
+      <!-- <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
-      </nav>
+      </nav> -->
     </div>
   </header>
 
-  <RouterView />
+  <!-- <RouterView /> -->
 </template>
 
 <style scoped>
