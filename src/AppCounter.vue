@@ -49,7 +49,7 @@ export default {
   },
   computed: {
     isShown() {
-      return this.counter < 15;
+      return this.counter < 25;
     },
     canRenderMinusButton() {
       return this.counter > 0;
@@ -62,6 +62,7 @@ export default {
     onPlus() {
       this.counter++;
       console.log('> Counter -> onPlus:', this.counter, this);
+      if (this.counter === 15) this.$router.push('/about');
     },
     onMinus() {
       this.counter--;
