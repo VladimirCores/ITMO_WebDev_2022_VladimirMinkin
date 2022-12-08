@@ -92,23 +92,50 @@ onMounted(() => validate());
 <template>
   <Spinner v-if="isLoading" />
   <main v-else>
-    <input v-model="inputTitleText" @keyup.enter="onCreateButtonClick" @keyup="validate" />
+    <Transition appear name="fade">
+      <input class="todo-input" v-model="inputTitleText" @keyup.enter="onCreateButtonClick" @keyup="validate" />
+    </Transition>
     <button ref="domButtonCreate" @click="onCreateButtonClick" :disabled="isActionButtonDisabled">Create</button>
-    <ol>
-      <li
+    <vs-list>
+      <vs-list-item
         v-for="(todo, index) in todos"
         @click.self="onTodoListItemClicked(todo)"
         :class="{ selected: checkTodoSelected(todo) }"
         :key="todo.id"
+        :title="todo.title"
       >
-        {{ todo.title }}
-        <RouterLink :to="getTodoRoute(index)">Open</RouterLink>
-        <button @click="onDeleteTodo(todo)" class="delete">x</button>
-      </li>
-    </ol>
+        <vs-row vs-align="center" class="todo-item">
+          <RouterLink :to="getTodoRoute(index)" class="open-todo-link">Open</RouterLink>
+          <vs-button color="danger" type="flat" @click="onDeleteTodo(todo)">Delete</vs-button>
+          <vs-switch color="success" v-model="todo.isCompleted" />
+        </vs-row>
+      </vs-list-item>
+    </vs-list>
   </main>
 </template>
 <style lang="scss" scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.todo-item {
+  *:not(:last-child) {
+    margin-right: 0.5rem;
+  }
+}
+.open-todo-link {
+  transition: all 0.1s ease-out;
+  font-size: 1em;
+  &:hover {
+    font-size: 1.2em;
+  }
+}
 .selected {
   background-color: #f1f1f1;
   outline: 1px solid #ccc;
