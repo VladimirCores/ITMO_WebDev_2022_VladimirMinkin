@@ -13,6 +13,7 @@ require('dotenv').config();
 
 const express = require('express');
 const fs = require('node:fs/promises');
+const sqlDB = require('./database.js');
 const app = express();
 
 async function saveDB() {
@@ -52,23 +53,75 @@ app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded()); 
 
 app.get('/users', (req, res) => {
-  res.status(200).json(db.users);
+  const sql ='SELECT * FROM user';
+  sqlDB.all(sql, [], (err, rows) => {
+    console.log("SELECT -> err:", err);
+    console.log("SELECT -> rows:", rows);
+    if (err) {
+      res.status(500).json({"error":err.toString()});
+    } else res.status(200).json({ rows: rows });
+  });
 });
 
 app.post('/users', async (req, res) => {
-  const userData = req.body;
-  console.log(userData);
-  db.users.push({ id: db.users.length , ...userData });
-  saveDB();
-  res.status(200).json(db.users);  
+  const data = req.body;
+  const errors=[]
+  if (!data.name){
+    errors.push("No name specified");
+  }
+  if (!data.password){
+    errors.push("No password specified");
+  }
+  if (!data.email){
+    errors.push("No email specified");
+  }
+  if (errors.length){
+    res.status(400).json({"error":errors.join(",")});
+    return;
+  }
+  const sql ='INSERT INTO user (name, surname, email, password) VALUES (?,?,?,?)'
+  console.log(data);
+  sqlDB.run(sql, [data.name, data.surname, data.email, data.password], (err) => {
+    if (err) {
+      console.log('INSERT error:', err);
+      res.status(500).json({"error":err.toString()});
+    } else {
+      res.status(200).json({ "ok": true });  
+    }
+  })
 });
+
+// app.get('/users/:id', (req, res) => {
+//   const userId = parseInt(req.params.id);
+//   console.log('> userId', userId);
+//   const user = db.users.find((user) => user.id === userId);
+//   if (user) res.status(200).json(user);
+//   else res.status(500).json({ message: `User with id(${userId}) not found` });
+// });
 
 app.get('/users/:id', (req, res) => {
   const userId = parseInt(req.params.id);
   console.log('> userId', userId);
-  const user = db.users.find((user) => user.id === userId);
-  if (user) res.status(200).json(user);
-  else res.status(500).json({ message: `User with id(${userId}) not found` });
+  const sql ='SELECT * FROM user WHERE id=?';
+  sqlDB.get(sql, [userId], (err, row) => {
+    console.log("SELECT ID -> err:", err);
+    console.log("SELECT ID -> row:", row);
+    if (err) {
+      res.status(500).json({"error":err.toString()});
+    } else res.status(200).json({ data: row });
+  });
+});
+
+app.delete('/users/:id', (req, res) => {
+  const userId = parseInt(req.params.id);
+  console.log('> userId', userId);
+  const sql ='DELETE FROM user WHERE id=?';
+  sqlDB.run(sql, [userId], (err) => {
+    console.log("DELETE ID -> err:", err);
+    if (err) {
+      res.status(500).json({"error":err.toString()});
+    } else res.status(200).json({ ok: true });
+  });
 });
 
 // to support URL-encoded bodies
