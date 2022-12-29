@@ -3,7 +3,7 @@ import { inject, ref, computed, onMounted, onUnmounted } from 'vue';
 
 const LIMIT = 10;
 
-const db: any = inject('db');
+const pb: any = inject('pb');
 
 const domInputFile = ref(null);
 const booksList = ref([]);
@@ -22,20 +22,15 @@ const canRenderNextPageButton = computed(
 const loadBooks = async () =>
   Promise.resolve()
     .then(() => (isLoading.value = true))
-    .then(() =>
-      db
-        .allDocs({
-          limit: LIMIT,
-          skip: currentPageIndex.value * LIMIT,
-          include_docs: true,
-        })
-        .then((result: any) => {
-          booksList.value = result.rows;
-          isLoading.value = false;
-          maxBooks.value = result.total_rows;
-          console.log(canRenderUpload.value, maxBooks.value, result);
-        }),
-    );
+    .then(() => pb
+      .collection('books')
+      .getList(1, LIMIT, {})
+    ).then((result) => {
+      booksList.value = result.items;
+      isLoading.value = false;
+      maxBooks.value = result.totalItems;
+      console.log(canRenderUpload.value, maxBooks.value, result);
+  });
 
 const getBookIndex = (index: number) =>
   1 + index + currentPageIndex.value * LIMIT;
@@ -58,10 +53,13 @@ const onUploadClick = () => {
     const selectedFile = fileList[0];
     console.log('selectedFile:', selectedFile);
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       const books = JSON.parse(reader.result! as string);
       console.log('selectedFile:', books);
-      db.bulkDocs(books);
+      for (let book of books) {
+        console.log('> book', book);
+        await pb.collection('books').create(book);
+      }
       reader.onload = null;
     };
     reader.readAsText(selectedFile);
@@ -70,28 +68,18 @@ const onUploadClick = () => {
   input.click();
 };
 
-const changes = db
-  .changes({
-    since: 'now',
-    live: true,
-    include_docs: true,
-  })
-  .on('change', function (change: any) {
+pb.collection('books')
+  .subscribe('*',(change: any) => {
     console.log('> change', change);
     loadBooks();
-  })
-  .on('complete', function (info: any) {
-    loadBooks();
-  })
-  .on('error', function (err: any) {
-    console.log(err);
   });
 
 onMounted(() => {
+  console.log('> BooksPage -> onMounted');
   loadBooks();
 });
 onUnmounted(() => {
-  changes.cancel();
+  pb.collection('books').unsubscribe();
 });
 </script>
 
@@ -119,7 +107,7 @@ onUnmounted(() => {
     </div>
     <div style="text-align: left; width: 400px">
       <div v-for="(book, index) in booksList">
-        {{ getBookIndex(index) }}. {{ book.doc.title }}
+        {{ getBookIndex(index) }}. {{ book.title }}
       </div>
     </div>
   </div>
